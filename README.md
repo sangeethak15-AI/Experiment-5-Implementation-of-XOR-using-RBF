@@ -1,63 +1,122 @@
-# Experiment-6---Heart-attack-prediction-using-MLP
-## Aim:
-To construct a  Multi-Layer Perceptron to predict heart attack using Python
-## Algorithm:
-1. Import the required libraries: numpy, pandas, MLPClassifier, train_test_split, StandardScaler, accuracy_score, and matplotlib.pyplot.<br>
-2. Load the heart disease dataset from a file using pd.read_csv().<br>
-3. Separate the features and labels from the dataset using data.iloc values for features (X) and data.iloc[:, -1].values for labels (y).<br>
-4. Split the dataset into training and testing sets using train_test_split().<br>
-5. Normalize the feature data using StandardScaler() to scale the features to have zero mean and unit variance.<br>
-6. Create an MLPClassifier model with desired architecture and hyperparameters, such as hidden_layer_sizes, max_iter, and random_state.<br>
-7. Train the MLP model on the training data using mlp.fit(X_train, y_train). The model adjusts its weights and biases iteratively to minimize the training loss.<br>
-8. Make predictions on the testing set using mlp.predict(X_test).<br>
-9. Evaluate the model's accuracy by comparing the predicted labels (y_pred) with the actual labels (y_test) using accuracy_score().<br>
-10. Print the accuracy of the model.<br>
-11. Plot the error convergence during training using plt.plot() and plt.show().<br>
+# Experiment-5-Implementation-of-XOR-using-RBF
 
-## Program:
+## AIM:
+  To classify the Binary input patterns of XOR data  by implementing Radial Basis Function Neural Networks.
+  
+## EQUIPMENTS REQUIRED:
+
+Hardware – PCs
+Anaconda – Python 3.7 Installation / Google Colab /Jupiter Notebook
+
+## RELATED THEORETICAL CONCEPT:
+Exclusive or is a logical operation that outputs true when the inputs differ.For the XOR gate, the TRUTH table will be as follows
+XOR truth table
+<img width="541" alt="image" src="https://user-images.githubusercontent.com/112920679/201299438-5d1926f9-25e9-4f20-b392-1c112880ef56.png">
+
+XOR is a classification problem, as it renders binary distinct outputs. If we plot the INPUTS vs OUTPUTS for the XOR gate, as shown in figure below
+<img width="246" alt="image" src="https://user-images.githubusercontent.com/112920679/201299568-d9398233-71d8-41b3-8b08-a39d5b95e3f1.png">
+
+The graph plots the two inputs corresponding to their output. Visualizing this plot, we can see that it is impossible to separate the different outputs (1 and 0) using a linear equation.
+
+A Radial Basis Function Network (RBFN) is a particular type of neural network. The RBFN approach is more intuitive than MLP. An RBFN performs classification by measuring the input’s similarity to examples from the training set. Each RBFN neuron stores a “prototype”, which is just one of the examples from the training set. When we want to classify a new input, each neuron computes the Euclidean distance between the input and its prototype. Thus, if the input more closely resembles the class A prototypes than the class B prototypes, it is classified as class A ,else class B.
+
+
+A Neural network with input layer, one hidden layer with Radial Basis function and a single node output layer (as shown in figure below) will be able to classify the binary data according to XOR output.
+
+<img width="261" alt="image" src="https://user-images.githubusercontent.com/112920679/201300944-5510d7f4-ea0f-45ec-875d-87f463927e9d.png">
+
+The RBF of hidden neuron as gaussian function 
+
+<img width="206" alt="image" src="https://user-images.githubusercontent.com/112920679/201302321-a09f72e9-2352-4f88-838c-3324f6c5f57e.png">
+
+
+## ALGORIHM:
+1. Initialize the input patterns for XOR Gate
+
+2. Initialize the desired output of the XOR Gate
+
+3. Define the function for RBF and function for prediction.
+
+4. Plot the graphs with inputs
+
+5. Find the weights
+
+6. Plot the graph with transformed inputs using RBF
+
+7. Test for the XOR patterns.
+
+## PROGRAM:
 ```python
 Developed By: Sangeetha.K
 Register No. 212221230085
 import numpy as np
-import pandas as pd 
-from sklearn.neural_network import MLPClassifier 
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler 
-from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
+def gaussian_rbf(x, landmark, gamma=1):
+    return np.exp(-gamma * np.linalg.norm(x - landmark)**2)
+def predict_matrix(point, weights):
+    gaussian_rbf_0 = gaussian_rbf(np.array(point), mu1)
+    gaussian_rbf_1 = gaussian_rbf(np.array(point), mu2)
+    A = np.array([gaussian_rbf_0, gaussian_rbf_1, 1])
+    return np.round(A.dot(weights))
+x1 = np.array([0, 0, 1, 1])
+x2 = np.array([0, 1, 0, 1])
+ys = np.array([0, 1, 1, 0])
+plt.figure(figsize=(13, 5))
+plt.subplot(1, 2, 1)
+plt.scatter((x1[0], x1[3]), (x2[0], x2[3]), label="Class_0")
+plt.scatter((x1[1], x1[2]), (x2[1], x2[2]), label="Class_1")
+plt.xlabel("X1")
+plt.ylabel("X2")
+plt.title("Linearly Inseparable")
+plt.legend()
 
-data=pd.read_csv("heart.csv")
-X=data.iloc[:, :-1].values #features 
-Y=data.iloc[:, -1].values  #labels 
+# centers
+mu1 = np.array([0, 1])
+mu2 = np.array([1, 0])
+from_1 = [gaussian_rbf(i, mu1) for i in zip(x1, x2)]
+from_2 = [gaussian_rbf(i, mu2) for i in zip(x1, x2)]
+A = []
+for i, j in zip(from_1, from_2):
+    temp = []
+    temp.append(i)
+    temp.append(j)
+    temp.append(1)
+    A.append(temp)
+A = np.array(A)
+W = np.linalg.inv(A.T.dot(A)).dot(A.T).dot(ys)
+print(np.round(A.dot(W)))
+print(ys)
+print("Weights:",W)
 
-X_train,X_test,y_train,y_test=train_test_split(X,Y,test_size=0.2,random_state=42)
-
-scaler=StandardScaler()
-X_train=scaler.fit_transform(X_train)
-X_test=scaler.transform(X_test)
-
-mlp=MLPClassifier(hidden_layer_sizes=(100,100),max_iter=1000,random_state=42)
-training_loss=mlp.fit(X_train,y_train).loss_curve_
-
-y_pred=mlp.predict(X_test)
-
-accuracy=accuracy_score(y_test,y_pred)
-print("Accuracy",accuracy)
-
-plt.plot(training_loss)
-plt.title("MLP Training Loss Convergence")
-plt.xlabel("Iteration")
-plt.ylabel("Training Losss")
-plt.show()
-
+plt.figure(figsize=(13, 5))
+plt.subplot(1, 2, 2)
+plt.scatter(from_1[0], from_2[0], label="Class_0")
+plt.scatter(from_1[1], from_2[1], label="Class_1")
+plt.scatter(from_1[2], from_2[2], label="Class_1")
+plt.scatter(from_1[3], from_2[3], label="Class_0")
+plt.plot([0, 0.95], [0.95, 0])
+plt.annotate("Seperating hyperplane", xy=(0.5, 0.5), xytext=(0.5, 0.5))
+plt.xlabel("µ1")
+plt.ylabel("µ2")
+plt.title("Transformed Inputs")
+plt.legend()
+print(f"Input:{np.array([0, 0])}, Predicted: {predict_matrix(np.array([0, 0]), W)}")
+print(f"Input:{np.array([0, 1])}, Predicted: {predict_matrix(np.array([0, 1]), W)}")
+print(f"Input:{np.array([1, 0])}, Predicted: {predict_matrix(np.array([1, 0]), W)}")
+print(f"Input:{np.array([1, 1])}, Predicted: {predict_matrix(np.array([1, 1]), W)}")
 ```
-## Output:
-### Loss Convergence graph
-<img width="449" alt="image" src="https://github.com/Shavedha/Experiment-6---Heart-attack-prediction-using-MLP/assets/93427376/0f5ac0c2-2f62-41b1-a410-2fda3ba4f556">
 
-### Accuracy
-<img width="234" alt="image" src="https://github.com/Shavedha/Experiment-6---Heart-attack-prediction-using-MLP/assets/93427376/40a192f3-3dce-4b50-aefe-5172c816b091">
 
-## Result:
-Thus, an ANN with MLP is constructed and trained to predict the heart attack using python.
-     
+## OUTPUT :
+### Predictions
+<img width="308" alt="image" src="https://github.com/Shavedha/Experiment-5-Implementation-of-XOR-using-RBF/assets/93427376/ff9c567a-6922-4c61-b9c9-5f3b4ffa7f22">
+
+### Linearly separable data
+<img width="429" alt="image" src="https://github.com/Shavedha/Experiment-5-Implementation-of-XOR-using-RBF/assets/93427376/439f3317-48df-4b56-a4b7-79fc1574d83c">
+
+### Transformed Inputs
+<img width="454" alt="image" src="https://github.com/Shavedha/Experiment-5-Implementation-of-XOR-using-RBF/assets/93427376/b87b1d6f-91fb-498c-b929-b0467f60524d">
+
+
+## RESULT:
+Thus XOR is implemeted using RBF successfully.
